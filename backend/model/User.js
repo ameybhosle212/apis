@@ -11,7 +11,9 @@ const userSchema = mongoose.Schema({
     password:{
         type:String,
         required:true
-    }
+    },
+    titles:[String],
+    SizeOfData:[Number]
 })
 
 const User = new mongoose.model('User',userSchema)
