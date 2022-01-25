@@ -5,6 +5,7 @@ import { getUserData , deleteData } from '../Helper';
 const Dashboard = ()=>{
     const [name , setName] = useState('');
     const [title, setTitle] = useState([])
+    const [crypt , setCrypt] = useState('');
     const [size, setSize] = useState([])
     useEffect(()=>{
         async function getData(){
@@ -13,6 +14,7 @@ const Dashboard = ()=>{
             setName(d["name"]);
             setSize(d["size"])
             setTitle(d["title"])
+            setCrypt(d["crypt"])
         }
         getData();
     },[])
@@ -34,7 +36,7 @@ const Dashboard = ()=>{
             {title.map((val , index)=>{
                 return(
                     <div key={index} className='border-4 border-l-pink-800'>
-                        <a href={`http://localhost:1001/${localStorage.getItem('user')}/view/${title[index]}`} target="_blank">Goto Link</a>
+                        <a href={`http://localhost:1001/${crypt}/view/${title[index]}`}>Goto Link</a>
                         <h4>{index+1}</h4>
                         <h3>Title is {title[index]}</h3>
                         <h3>Data Size is {size[index]}</h3>

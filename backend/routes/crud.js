@@ -57,7 +57,8 @@ route.post("/dashboard",async(req,res)=>{
         var obj = {
           'title':user.titles,
           'name':user.uname,
-          'size':user.SizeOfData
+          'size':user.SizeOfData,
+          'crypt':user.encryptedID
         }
         console.log(obj);
         return res.json({'data':obj,'status':'ok'})

@@ -1,7 +1,9 @@
 const route = require('express').Router()
 const User = require('../model/User')
 const jwt = require('jsonwebtoken')
+const mongoose = require('mongoose')
 require('dotenv').config()
+var CryptoJS = require("crypto-js");
 const redis = require('redis');
 const client = redis.createClient({port:'6379',host:'localhost'});
 
@@ -41,10 +43,11 @@ route.post("/register",async(req,res)=>{
             email:email,
             password:password
         })
+        newUser.encryptedID = CryptoJS.enc.Base64.stringify(CryptoJS.enc.Utf8.parse(newUser._id.toString()));
         newUser.save();
         return res.json({'data':newUser,'status':'ok','error':null})
     }else{
-        return res,json({'data':'Email Id exists','status':'error','error':'error'})
+        return res.json({'data':'Email Id exists','status':'error','error':'error'})
     }
 })
 
@@ -65,10 +68,10 @@ route.post("/login",async(req,res)=>{
 
 route.get("/:token/view/:title",async(req,res)=>{
     const token = req.params.token;
-    var token1 = jwt.verify(token , process.env.secret);
-    if(token1!= null && token1.id){
+    var token1 = CryptoJS.enc.Base64.parse(token).toString(CryptoJS.enc.Utf8);
+    if(token1!= null){
         const title = req.params.title;
-        const user = await User.find({_id:token1.id,titles:title});
+        const user = await User.find({_id:token1 ,titles:title});
         if(user){
             // await client.connect();
             // var data = await client.hget(id , title)
@@ -78,7 +81,7 @@ route.get("/:token/view/:title",async(req,res)=>{
             return res.json({'data':'Wrong Data','status':'error'})
         }
     }else{
-
+        return res.json({"data":'error'})
     }
   })
 
