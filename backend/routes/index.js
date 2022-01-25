@@ -52,15 +52,34 @@ route.post("/login",async(req,res)=>{
     const {uname , password} = req.body;
     const data = await User.findOne({uname:uname});
     if(!data){
-        return res.json({'data':'Redirect to register','status':'error'})
+        return res.json({'data':'Redirect to register','status':'error','error':'error'})
     }else{
         var ob = {
             'id':data._id,
             'uname':data.uname
         }
         var token = jwt.sign(ob,process.env.secret)
-        return res.json({'data':token,'status':'ok','error':null})
+        return res.json({'token':token,'status':'ok','error':null})
     }
 })
+
+route.get("/:token/view/:title",async(req,res)=>{
+    const token = req.params.token;
+    var token1 = jwt.verify(token , process.env.secret);
+    if(token1!= null && token1.id){
+        const title = req.params.title;
+        const user = await User.find({_id:token1.id,titles:title});
+        if(user){
+            // await client.connect();
+            // var data = await client.hget(id , title)
+            // await client.quit();
+            return res.json({'data':'data','status':'ok'})
+        }else{
+            return res.json({'data':'Wrong Data','status':'error'})
+        }
+    }else{
+
+    }
+  })
 
 module.exports = route;
