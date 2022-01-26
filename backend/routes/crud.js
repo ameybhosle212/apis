@@ -32,13 +32,13 @@ route.post('/create',async(req,res)=>{
           }
           newArray.push(obj);
         }
-        // await client.connect();
-        // await client.hSet(isTrue.id , title , JSON.stringify(newArray))
+        await client.connect();
+        await client.hSet(isTrue.id , title , JSON.stringify(newArray))
         user.titles.push(title);
-        // var data = await client.hget(isTrue.id , title)
-        // user.SizeOfData.push(JSON.parse(data).length)
+        var data = await client.hget(isTrue.id , title)
+        user.SizeOfData.push(JSON.parse(data).length)
         user.save();
-        // await client.quit();
+        await client.quit();
         return res.json({'formDtaaValue':formDataValue,'formDataName':formDataName,'data':newArray,'status':'ok'})
       }else{
         return res.json({'data':'error','status':'error','redirect':'logout'})
@@ -76,27 +76,17 @@ route.post("/delete",async(req,res)=>{
   const isTrue = jwt.verify(token , process.env.secret);
     if(isTrue){
       const user = await User.findById(isTrue.id);
-      if(user){
-        user.titles.pull(titleToBeDeleted)
-        user.SizeOfData.splice(titleToBeDeleted , 1);
-        // var d = user.titles;
-        // var j;
-        // for (let index = 0; index < d.length; index++) {
-        //     if(titleToBeDeleted === d[index]){
-        //         j = index
-        //     }
-        // }
-        // d.splice(j , 1);
-        // user.titles = d;
-        // var df = user.SizeOfData;
-        // df.splice(j,1);
-        // user.SizeOfData = df;
-        console.log(user);
-        user.save();
-        return res.json({'data':'data','status':'ok'})
-      }else{
-        return res.json({'data':'Wrong Data','status':'error'})
-      }
+        const dd = await User.updateOne({ id: isTrue.id }, {
+          $pullAll: {
+            titles: titleToBeDeleted,
+          },
+        });
+        if(dd){
+          console.log(user);
+          return res.json({'data':'data','status':'ok'})
+        }else{
+          return res.json({'data':'Wrong Data','status':'error'})
+        }
     }else{
       return res.json({'data':'invalid','status':'error'})
     }

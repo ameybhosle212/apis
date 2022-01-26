@@ -3,8 +3,6 @@ const User = require('../model/User')
 const jwt = require('jsonwebtoken')
 var bcrypt = require('bcryptjs');
 var salt = bcrypt.genSaltSync(10);
-var hash = bcrypt.hashSync("B4c0/\/", salt);
-const mongoose = require('mongoose')
 require('dotenv').config()
 var CryptoJS = require("crypto-js");
 const redis = require('redis');
@@ -82,10 +80,10 @@ route.get("/:token/view/:title",async(req,res)=>{
         const title = req.params.title;
         const user = await User.find({_id:token1 ,titles:title});
         if(user){
-            // await client.connect();
-            // var data = await client.hget(id , title)
-            // await client.quit();
-            return res.json({'data':'data','status':'ok'})
+            await client.connect();
+            var data = await client.hget(id , title)
+            await client.quit();
+            return res.json(data);
         }else{
             return res.json({'data':'Wrong Data','status':'error'})
         }
