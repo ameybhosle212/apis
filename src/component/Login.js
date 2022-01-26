@@ -9,6 +9,10 @@ const Login = ()=>{
         // console.log(name + '  ' + password);
         var data = await Logined(name , password);
         if(data.error == "error"){
+            if(data.redirect){
+                window.alert("Redirecting to Register as User Not Created")
+                window.location = data.redirect;
+            }
             window.alert("SOMETHING WENT WRONG RELOAD THE SCREEN")
         }else{
             window.alert("Success");
@@ -19,9 +23,9 @@ const Login = ()=>{
     return (
         <form onSubmit={Submit}>
             Uname:
-            <input name="name" onChange={e => setName(e.target.value)}  /><br />
+            <input name="name" type={"text"} onChange={e => setName(e.target.value)}  /><br />
             Password:
-            <input name="password" onChange={e =>setPassword(e.target.value)} />
+            <input name="password" type={"password"} onChange={e =>setPassword(e.target.value)} />
             <button>Submit</button>
         </form>
     );

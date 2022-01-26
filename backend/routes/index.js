@@ -1,6 +1,9 @@
 const route = require('express').Router()
 const User = require('../model/User')
 const jwt = require('jsonwebtoken')
+var bcrypt = require('bcryptjs');
+var salt = bcrypt.genSaltSync(10);
+var hash = bcrypt.hashSync("B4c0/\/", salt);
 const mongoose = require('mongoose')
 require('dotenv').config()
 var CryptoJS = require("crypto-js");
@@ -38,10 +41,11 @@ route.post("/register",async(req,res)=>{
     const {uname, email , password} = req.body;
     const data = await User.findOne({email:email})
     if(!data){
+        var hash = bcrypt.hashSync(password, salt);
         const newUser = new User({
             uname:uname,
             email:email,
-            password:password
+            password:hash
         })
         newUser.encryptedID = CryptoJS.enc.Base64.stringify(CryptoJS.enc.Utf8.parse(newUser._id.toString()));
         newUser.save();
@@ -55,14 +59,19 @@ route.post("/login",async(req,res)=>{
     const {uname , password} = req.body;
     const data = await User.findOne({uname:uname});
     if(!data){
-        return res.json({'data':'Redirect to register','status':'error','error':'error'})
+        return res.json({'data':'Redirect to register','status':'error','error':'error','redirect':'register'})
     }else{
-        var ob = {
-            'id':data._id,
-            'uname':data.uname
+        var dd = bcrypt.compareSync(password,data.password);
+        if(dd){
+            var ob = {
+                'id':data._id,
+                'uname':data.uname
+            }
+            var token = jwt.sign(ob,process.env.secret)
+            return res.json({'token':token,'status':'ok','error':null})
+        }else{
+            return res.json({'data':'incorrect Password','status':'null'})
         }
-        var token = jwt.sign(ob,process.env.secret)
-        return res.json({'token':token,'status':'ok','error':null})
     }
 })
 
