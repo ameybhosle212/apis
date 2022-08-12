@@ -32,14 +32,14 @@ route.post('/create',async(req,res)=>{
           }
           newArray.push(obj);
         }
-        await client.connect();
-        await client.hSet(isTrue.id , title , JSON.stringify(newArray))
+        // await client.connect();
+        // await client.hSet(isTrue.id , title , JSON.stringify(newArray))
         user.titles.push(title);
-        var data = await client.hget(isTrue.id , title)
-        user.SizeOfData.push(JSON.parse(data).length)
+        // var data = await client.hget(isTrue.id , title)
+        // user.SizeOfData.push(JSON.parse(data).length)
         user.save();
-        await client.quit();
-        return res.json({'formDtaaValue':formDataValue,'formDataName':formDataName,'data':newArray,'status':'ok'})
+        // await client.quit();
+        return res.json({'formDtaaValue':newArray,'formDataName':formDataName,'data':newArray,'status':'ok'})
       }else{
         return res.json({'data':'error','status':'error','redirect':'logout'})
       }
@@ -50,6 +50,7 @@ route.post('/create',async(req,res)=>{
 
 route.post("/dashboard",async(req,res)=>{
   const { token } = req.body;
+  console.log(token);
   const isTrue = jwt.verify(token , process.env.secret);
     if(isTrue){
       const user = await User.findById(isTrue.id);

@@ -5,11 +5,13 @@ const Register = ()=>{
     const [name , setName] = useState('')
     const [email , setEmail] = useState('')
     const [password , setPassword] = useState('')
-    const Submit = (e)=>{
+    const Submit = async (e)=>{
         e.preventDefault();
-        var data = Registered(name , email ,password);
-        if(data.error == "error"){
-            window.alert(`${data.info}`)
+        var data = await Registered(name , email ,password);
+        console.log(data);
+        if(data.redirect){
+            window.alert(`${data.data}`)
+            window.location = `/${data.redirect}`
         }else{
             window.alert("USER CREATED");
             window.location = "/login";

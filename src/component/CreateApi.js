@@ -17,6 +17,7 @@ const CreateApi = ()=>{
         e.preventDefault();
         console.log(formDataName , formDataValue , nu , title);
         const d = await createData(title , formDataName , formDataValue , nu , localStorage.getItem('user'));
+        console.log(d);
         if(d){
             window.location = '/dashboard';
         }else{
