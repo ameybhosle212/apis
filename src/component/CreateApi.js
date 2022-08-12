@@ -1,15 +1,27 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import '../App.css';
+import { createData } from '../Helper';
 
 const CreateApi = ()=>{
     const inpArr = ["Number","ID","Date","Password","Email","Mongoose Schema ID","Bitcoin Address","Country","Currency","Gender"];
     const [nu ,  setNu] = useState(100);
+    const [title ,  setTitle] = useState('');
     const [Valuetypes , setValuetypes] = useState(inpArr)
     const [formDataName , setFormDataName] = useState([])
     const [formDataValue , setFormDataValue] = useState([])
-    const Submit = (e)=>{
+    console.log('Changed formDataValue');
+    useEffect(()=>{
+        console.log('Changed formDataName');
+    },[formDataName,formDataValue])
+    const Submit = async(e)=>{
         e.preventDefault();
-        console.log(formDataName , formDataValue , nu);
+        console.log(formDataName , formDataValue , nu , title);
+        const d = await createData(title , formDataName , formDataValue , nu , localStorage.getItem('user'));
+        if(d){
+            window.location = '/dashboard';
+        }else{
+            window.location = '/';
+        }
     }
     const AddField = ()=>{
         setFormDataName([...formDataName , "name"])
@@ -33,17 +45,22 @@ const CreateApi = ()=>{
             setFormDataName([]);
         }
         else{
-            var d = formDataName.splice(index,1);
+            
             console.log(index);
-            setFormDataName(d);
-            var v = formDataValue.splice(index , 1);
-            setFormDataValue(v);
+            console.log('Before deleting ' + formDataName);
+            formDataName.splice(index,1)
+            console.log('After deleting '+formDataName);
+            setFormDataName([...formDataName]);
+            formDataValue.splice(index , 1)
+            setFormDataValue([...formDataValue]);
+            console.log(formDataValue);
         }
-        
     }
     return (
         <div>
             <form onSubmit={Submit}>
+                Title:
+                <input name='title' onChange={(e)=>setTitle(e.target.value)} required />
                 {formDataName.map((value, index)=>{
                     return(
                         <div key={index} className='border-2 border-cyan-900 px-12 py-12'>

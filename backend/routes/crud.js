@@ -13,6 +13,10 @@ client.on("error", function (err) {
 
 route.post('/create',async(req,res)=>{
     const {title , formDataName , formDataValue , nu , token } = req.body;
+    formDataName.map((val,index)=>{
+      formDataName[index] = val.toLowerCase();
+      formDataValue[index] = formDataValue[index].toLowerCase();
+    })
     const isTrue = jwt.verify(token , process.env.secret);
     if(isTrue){
       const user = await User.findById(isTrue.id);
@@ -33,8 +37,9 @@ route.post('/create',async(req,res)=>{
         user.titles.push(title);
         var data = await client.hget(isTrue.id , title)
         user.SizeOfData.push(JSON.parse(data).length)
+        user.save();
         await client.quit();
-        return res.json({'data':'Done','status':'ok'})
+        return res.json({'formDtaaValue':formDataValue,'formDataName':formDataName,'data':newArray,'status':'ok'})
       }else{
         return res.json({'data':'error','status':'error','redirect':'logout'})
       }
@@ -43,7 +48,7 @@ route.post('/create',async(req,res)=>{
     }
 })
 
-route.post("/dashboard",(req,res)=>{
+route.post("/dashboard",async(req,res)=>{
   const { token } = req.body;
   const isTrue = jwt.verify(token , process.env.secret);
     if(isTrue){
@@ -52,8 +57,10 @@ route.post("/dashboard",(req,res)=>{
         var obj = {
           'title':user.titles,
           'name':user.uname,
-          'size':SizeOfData
+          'size':user.SizeOfData,
+          'crypt':user.encryptedID
         }
+        console.log(obj);
         return res.json({'data':obj,'status':'ok'})
       }else{
         return res.json({'data':'Wrong Data','status':'error'})
@@ -63,29 +70,23 @@ route.post("/dashboard",(req,res)=>{
     }
 })
 
-route.post("/delete",(req,res)=>{
+route.post("/delete",async(req,res)=>{
   const { token , titleToBeDeleted } = req.body;
+  console.log(titleToBeDeleted);
   const isTrue = jwt.verify(token , process.env.secret);
     if(isTrue){
       const user = await User.findById(isTrue.id);
-      if(user){
-        var d = user.titles;
-        var j;
-        for (let index = 0; index < d.length; index++) {
-            if(titleToBeDeleted === d[index]){
-                j = index
-            }
+        const dd = await User.updateOne({ id: isTrue.id }, {
+          $pullAll: {
+            titles: titleToBeDeleted,
+          },
+        });
+        if(dd){
+          console.log(user);
+          return res.json({'data':'data','status':'ok'})
+        }else{
+          return res.json({'data':'Wrong Data','status':'error'})
         }
-        d.splice(j , 1);
-        user.titles = d;
-        var df = user.SizeOfData;
-        df.splice(j,1);
-        user.SizeOfData = df;
-        user.save();
-        return res.json({'data':'data','status':'ok'})
-      }else{
-        return res.json({'data':'Wrong Data','status':'error'})
-      }
     }else{
       return res.json({'data':'invalid','status':'error'})
     }
