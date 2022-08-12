@@ -16,7 +16,7 @@ const Dashboard = ()=>{
             setTitle(d["title"])
             setCrypt(d["crypt"])
         }
-        getData();
+        getData();  
     },[])
     const Delete = async(index)=>{
         console.log(index);

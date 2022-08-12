@@ -6,15 +6,12 @@ const Login = ()=>{
     const [password , setPassword] = useState('')
     const Submit = async(e)=>{
         e.preventDefault();
-        // console.log(name + '  ' + password);
         var data = await Logined(name , password);
-        if(data.error == "error"){
-            if(data.redirect){
-                window.alert("Redirecting to Register as User Not Created")
-                window.location = data.redirect;
-            }
-            window.alert("SOMETHING WENT WRONG RELOAD THE SCREEN")
+        if(data.redirect ){
+            window.alert("Redirecting to Register as User Not Created")
+            window.location = `/${data.redirect}`;
         }else{
+            console.log(data);
             window.alert("Success");
             localStorage.setItem('user',data.token);
             window.location = '/dashboard';

@@ -9,12 +9,7 @@ export const Logined = async(v1,v2)=>{
         'uname':v1,
         'password':v2
     })
-    if(data&& data.status === "ok"){
-        console.log(data);
-        return data;
-    }else{
-        return false;
-    }
+    return data;
 }
 
 export const Registered = async(v1,v2,v3)=>{
@@ -23,12 +18,7 @@ export const Registered = async(v1,v2,v3)=>{
         'email':v2,
         'password':v3
     })
-    if(data&& data.status === "ok"){
-        console.log(data);
-        return data;
-    }else{
-        return false;
-    }
+    return data;
 }
 
 

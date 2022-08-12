@@ -49,7 +49,7 @@ route.post("/register",async(req,res)=>{
         newUser.save();
         return res.json({'data':newUser,'status':'ok','error':null})
     }else{
-        return res.json({'data':'Email Id exists','status':'error','error':'error'})
+        return res.json({'data':'Email Id exists','status':'error','error':'error','redirect':'login'})
     }
 })
 
@@ -68,7 +68,7 @@ route.post("/login",async(req,res)=>{
             var token = jwt.sign(ob,process.env.secret)
             return res.json({'token':token,'status':'ok','error':null})
         }else{
-            return res.json({'data':'incorrect Password','status':'null'})
+            return res.json({'data':'incorrect Password','status':'null','error':'error'})
         }
     }
 })
@@ -80,10 +80,10 @@ route.get("/:token/view/:title",async(req,res)=>{
         const title = req.params.title;
         const user = await User.find({_id:token1 ,titles:title});
         if(user){
-            await client.connect();
-            var data = await client.hget(id , title)
-            await client.quit();
-            return res.json(data);
+            // await client.connect();
+            // var data = await client.hget(id , title)
+            // await client.quit();
+            return res.json(user);
         }else{
             return res.json({'data':'Wrong Data','status':'error'})
         }
